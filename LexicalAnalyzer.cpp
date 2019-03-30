@@ -15,7 +15,7 @@ using namespace std;
 *
 */
 
-string JudgeKI(string KWorID,map<string,string> mapp){
+string JudgeKI(string KWorID,map<string,string> mapp){//判断关键字还是标识符
     try
     {
       string KI=mapp.at(KWorID);
@@ -28,7 +28,7 @@ string JudgeKI(string KWorID,map<string,string> mapp){
 }
 
 bool IsNumber(char ch){
-      if(ch>47 && ch<58){
+      if(ch>47 && ch<58 || ch==46){//增加点“.”46的考虑，以解决浮点数的问题
         return true;
       }
       else
@@ -38,7 +38,7 @@ bool IsNumber(char ch){
 }
 
 bool IsLetter(char ch){
-    if((ch>64&&ch<91)||(ch>96&&ch<122)){
+    if((ch>64&&ch<91)||(ch>96&&ch<122)){ 
       return true;
     }else
     {
@@ -49,8 +49,8 @@ bool IsLetter(char ch){
 
 int main()
 {
-    //使用的是无序的haspmap，实现了logN的时间复杂度
-    // << >> += -= 等另外处理
+    //使用的是无序的haspmap，可快速进行查找，实现了logN的时间复杂度
+    // << >> += -= 等另外处理，当遇到一个的时候，再扫下一个看是否是特殊符号，如果是则一同输出为特殊符号
     map<char,char> Sign_map{{'#','#'},{'+','+'},{'-','-'},{'*','*'},{'/','/'},{'%','%'},{'=','='},
                                 {'<','<'},{'>','>'},{'{','{'},{';',';'},{'(','('},{')',')'},{'}','}'}
     };
@@ -61,7 +61,7 @@ int main()
                                   {"bool","bool"},{"if","if"},{"else","else"},{"class","class"},{"break","break"},
                                   {"const","const"},{"continue","continue"},{"public","public"},{"for","for"},
                                   {"while","while"},{"void","void"},{"do","do"},{"switch","switch"},{"char","char"},
-                                  };//持续添加中……
+                                  {"string","string"},{"return","return"}};//持续添加中……
 
     //注释另外处理
     //空格不处理
@@ -87,7 +87,7 @@ int main()
       for(i;i<line.size();i++){
           char ch=line[i];
 
-          if(IsLetter(ch)||ch=='.'){
+          if(IsLetter(ch)||(IsLetter(line[i-1])&&ch=='.')){  //该处考虑了.h头文件的情况,注意这里会跟浮点数的小数点混淆
             keyW+=ch;
             continue;
           }
@@ -98,19 +98,19 @@ int main()
             keyW="";
           };
 
-          if(IsNumber(ch) || (!(IsNumber(ch))&&ch=='.')){//float or double
+          if(IsNumber(ch)){//考虑了float or double的情况，暂时不支持科学计数法
             number+=ch;
             continue;
           }
 
-          if(!(IsNumber(ch)) && number!=""){
+          if(!(IsNumber(ch)) && number!=""){  //如果是不是数字，且数字的string非空
             cout<<number<<"  "<<"数字"<<endl;
             CompressFile<<number;
             number="";
           }
 
           if(ch==34){//34为双引号，里面的东西输出为串；没有考虑换行输出的情况
-            int j=i+1,p=i,q;
+            int j=i+1,p=i,q; //p，q指针记录“串”的初始位置和结束位置
             for(j;j<line.size();j++){
               if(line[j]==34){
                 q=j;
@@ -122,14 +122,14 @@ int main()
             }
             cout<<Cuan<<"  "<<"串"<<endl;
             CompressFile<<Cuan;
+            Cuan="";
             i=q+1;
             
           }
 
-          try
+          try //map需要用try catch来处理不存在的情况，巧妙解决了两个连续的特殊符号 例如+= -= << >>等
           {
             char c=Sign_map.at(ch);
-            // char cc=Sign_map.at(line[i+1]);
              try
             {
               char cc=Sign_map.at(line[i+1]);
@@ -146,7 +146,7 @@ int main()
             
           }
           catch(const std::exception& e)
-          {   //Nothing
+          {   //Do Nothing
           }
 
       }

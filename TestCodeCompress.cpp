@@ -1,1 +1,1 @@
-#include<iostream.h>main(){inti;cin>>i;if(i>3)cout<<"Ok"<endl;}
+#include<iostream.h>#include<string>usingnamespacestd;intmain(){inti;cin>>i;floatx=12.23;if(i>3)cout<<"Ok"<endl;return0;}
