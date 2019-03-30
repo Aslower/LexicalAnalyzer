@@ -91,6 +91,7 @@ int main()
       
       string keyW="";
       string number="";
+      string Cuan="";
       // int num[50];
       // fill_n(num,52,-1);
 
@@ -115,6 +116,22 @@ int main()
           if(!(IsNumber(ch)) && number!=""){
             cout<<number<<"  "<<"数字"<<endl;
             number="";
+          }
+
+          if(ch==34){//34为双引号，里面的东西输出为串；没有考虑换行的情况
+            int j=i+1,p=i,q;
+            for(j;j<line.size();j++){
+              if(line[j]==34){
+                q=j;
+                break;
+              }
+            }
+            while(p!=q+1){
+              Cuan+=line[p++];
+            }
+            cout<<Cuan<<"  "<<"串"<<endl;
+            i=q+1;
+            
           }
 
           try
@@ -163,6 +180,6 @@ int main()
 
 
 
-    cout<<endl<<"@Erving__All Rights Reserved__感谢您的使用，词法分析完成！"<<endl;
+    cout<<endl<<"  @Erving \n All Rights Reserved \n 感谢您的使用，词法分析完成！"<<endl;
     return 0;
 }
