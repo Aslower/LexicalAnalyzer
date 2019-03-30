@@ -27,19 +27,6 @@ string JudgeKI(string KWorID,map<string,string> mapp){
     }
 }
 
-void Sign(char ch,map<char,char> mapp){
-    // try
-    // {
-    //   char c=mapp.at(ch);
-    //   cout<<ch<<"  "<<"特殊字符"<<endl;
-    // }
-    // catch(const std::exception& e)
-    // {
-    //   cerr<<
-    // }
-    
-}
-
 bool IsNumber(char ch){
       if(ch>47 && ch<58){
         return true;
@@ -62,10 +49,8 @@ bool IsLetter(char ch){
 
 int main()
 {
-  
-    string line;
-    string KWorID;
-    // << 另外处理
+    //使用的是无序的haspmap，实现了logN的时间复杂度
+    // << >> += -= 等另外处理
     map<char,char> Sign_map{{'#','#'},{'+','+'},{'-','-'},{'*','*'},{'/','/'},{'%','%'},{'=','='},
                                 {'<','<'},{'>','>'},{'{','{'},{';',';'},{'(','('},{')',')'},{'}','}'}
     };
@@ -78,22 +63,26 @@ int main()
                                   {"while","while"},{"void","void"},{"do","do"},{"switch","switch"},{"char","char"},
                                   };//持续添加中……
 
-    //<> 特殊字符的判断先存起来，该行找到另一个匹配则不判断为操作符；注释另外处理
-    //移位和输出"<< >>"判读？ 后面一个是数字
+    //注释另外处理
     //空格不处理
-    int s=1;
+    string line; //以行为单位进行分析
+    string KWorID; //存储关键字或者标识符
     
-    ifstream LexicalFile ("TestCode.cpp");
+    ifstream LexicalFile ("TestCode.cpp");//词法分析测试文件
+    ofstream CompressFile("TestCodeCompress.cpp");//压缩文件
+    CompressFile.clear();
+
     if(LexicalFile.is_open()){
         while( getline (LexicalFile,line) )
     {
+      //add 压缩功能，直接在cout后加输出就行
       int i=0;
       
       string keyW="";
       string number="";
       string Cuan="";
-      // int num[50];
-      // fill_n(num,52,-1);
+      // int num[50];   不打算用数组了，比较繁琐
+      // fill_n(num,52,-1);  初始化填充为-1
 
       for(i;i<line.size();i++){
           char ch=line[i];
@@ -105,20 +94,22 @@ int main()
 
           if(!(IsLetter(ch)) && keyW!=""){//空格为32；没考虑类似“int x=9；”即标识符后连着其他特殊符号的情况
             cout<<keyW<<"  "<<JudgeKI(keyW,KeyWord_map)<<endl;
+            CompressFile<<keyW;
             keyW="";
           };
 
-          if(IsNumber(ch)){
+          if(IsNumber(ch) || (!(IsNumber(ch))&&ch=='.')){//float or double
             number+=ch;
             continue;
           }
 
           if(!(IsNumber(ch)) && number!=""){
             cout<<number<<"  "<<"数字"<<endl;
+            CompressFile<<number;
             number="";
           }
 
-          if(ch==34){//34为双引号，里面的东西输出为串；没有考虑换行的情况
+          if(ch==34){//34为双引号，里面的东西输出为串；没有考虑换行输出的情况
             int j=i+1,p=i,q;
             for(j;j<line.size();j++){
               if(line[j]==34){
@@ -130,6 +121,7 @@ int main()
               Cuan+=line[p++];
             }
             cout<<Cuan<<"  "<<"串"<<endl;
+            CompressFile<<Cuan;
             i=q+1;
             
           }
@@ -142,44 +134,33 @@ int main()
             {
               char cc=Sign_map.at(line[i+1]);
               cout<<c<<cc<<"  "<<"特殊符号"<<endl;
+              CompressFile<<c<<cc;
               i++;
               
             }
             catch(const std::exception& e)
             {
               cout<<c<<"  "<<"特殊符号"<<endl;
+              CompressFile<<c;
             }
             
           }
           catch(const std::exception& e)
-          {   
+          {   //Nothing
           }
-          
-          
-          // string s=ch+"";
-          // Sign(ch,Sign_map);
-
-          
-          
-          
-          
 
       }
 
 
-
     }
     LexicalFile.close();
+    CompressFile.close();
     }
+
+
+    cout<<endl<<"   感谢您的使用，词法分析完成！"<<endl;
+    cout<<"***压缩功能完成，请查看TestCodeCompress.cpp文件！***"<<endl;
+    cout<<endl<<"  @Erving \n All Rights Reserved \n "<<endl;
     
-
-
-
-
-
-
-
-
-    cout<<endl<<"  @Erving \n All Rights Reserved \n 感谢您的使用，词法分析完成！"<<endl;
     return 0;
 }

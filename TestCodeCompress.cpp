@@ -1,0 +1,1 @@
+#include<iostream.h>main(){inti;cin>>i;if(i>3)cout<<"Ok"<endl;}
